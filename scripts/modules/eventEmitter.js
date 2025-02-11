@@ -1,30 +1,25 @@
 class EventEmitter {
   constructor() {
-    this.events = {};
+    this.eventos = {};
   }
 
-  // Adiciona um ouvinte para um evento específico
-  on(event, listener) {
-    if (!this.events[event]) {
-      this.events[event] = [];
+  on(evento, callback) {
+    if (!this.eventos[evento]) {
+      this.eventos[evento] = [];
     }
-    this.events[event].push(listener);
+    this.eventos[evento].push(callback);
   }
 
-  // Emite um evento, chamando todos os ouvintes associados
-  emit(event, ...args) {
-    if (this.events[event]) {
-      this.events[event].forEach((listener) => listener(...args));
-    }
+  off(evento, callback) {
+    if (!this.eventos[evento]) return;
+    this.eventos[evento] = this.eventos[evento].filter(cb => cb !== callback);
   }
 
-  // Remove um ouvinte específico para um evento
-  off(event, listener) {
-    if (this.events[event]) {
-      this.events[event] = this.events[event].filter((l) => l !== listener);
+  emit(evento, ...args) {
+    if (this.eventos[evento]) {
+      this.eventos[evento].forEach(callback => callback(...args));
     }
   }
 }
 
-export const emitter = new EventEmitter();
-
+export const eventEmitter = new EventEmitter()

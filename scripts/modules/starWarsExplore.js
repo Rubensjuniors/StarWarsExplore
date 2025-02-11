@@ -1,4 +1,4 @@
-import { emitter } from "./eventEmitter.js";
+import { eventEmitter } from "./eventEmitter.js";
 
 class StarWarsExplore {
   #dataLoaded
@@ -33,60 +33,69 @@ class StarWarsExplore {
 
       const data = await response.json();
 
-      this.reset()
+      this.reset();
       this.#dataLoaded = data?.results ?? [];
       this.#previousPage = data?.previous ?? false;
       this.#nextPage = data?.next ?? false;
       this.#total = data?.count ?? 0;
+
+      eventEmitter.emit("dataLoaded", {
+        path,
+        page,
+        total: this.#total,
+        data: this.#dataLoaded
+      });
+
     } catch (err) {
-      console.error(`Erro ao buscar dados de ${endpoint}: ${err.message}`);
+      console.error(`Erro ao buscar dados de ${path}: ${err.message}`);
+
+      eventEmitter.emit("fetchError", {
+        path,
+        page,
+        error: err.message
+      });
     }
   }
 
   async fetchPeople(page = 1) {
-    emitter.emit('message', 'fetch people is completed')
     await this.fetchData("people", page);
   }
   async fetchPlanets(page = 1) {
-    emitter.emit('message', 'fetch planets is completed')
     await this.fetchData("planets", page);
   }
   async fetchStarships(page = 1) {
-    emitter.emit('message', 'fetch starships is completed')
     await this.fetchData("starships", page);
   }
 
   getLoadedItems() {
-    emitter.emit('message', 'get loadedItems')
     return this.#dataLoaded;
   }
 
   getNextPage() {
-    emitter.emit('message', 'get nextPage')
-    return this.#nextPage
+    return this.#nextPage;
   }
 
   getPreviousPage() {
-    emitter.emit('message', 'get previousPage')
-    return this.#previousPage
+    return this.#previousPage;
   }
 
   getTotal() {
-    emitter.emit('message', 'get total')
-    return this.#total
+    return this.#total;
   }
 
   getSearchItem() {
-    return this.#searchItems
+    return this.#searchItems;
   }
 
   search(name) {
     const filtered = this.getLoadedItems().filter(item => item?.name === name);
     this.#searchItems = filtered;
 
-    emitter.emit('message', `search: ${name}`)
+    eventEmitter.emit("searchPerformed", {
+      name,
+      results: filtered
+    });
   }
-
 }
 
 export const starWarsExplore = new StarWarsExplore();

@@ -1,5 +1,5 @@
 import { createdCard } from "./modules/createCard.js";
-import { emitter } from "./modules/eventEmitter.js";
+import { eventEmitter } from "./modules/eventEmitter.js";
 import { starWarsExplore } from "./modules/starWarsExplore.js";
 
 const radioInputs = document.querySelectorAll('#radio-input')
@@ -65,6 +65,14 @@ if (currentRadio) {
   getData({ target: currentRadio });
 }
 
-emitter.on('mensagem', (data) => {
-  console.log(`Recebido: ${data}`);
+eventEmitter.on("dataLoaded", ({ path, page, total }) => {
+  console.log(`🚀 Dados carregados de ${path} (Página ${page}) - Total: ${total}`);
+});
+
+eventEmitter.on("fetchError", ({ path, error }) => {
+  console.error(`❌ Erro ao carregar ${path}: ${error}`);
+});
+
+eventEmitter.on("searchPerformed", ({ name, results }) => {
+  console.log(`🔍 Busca por "${name}" - Resultados encontrados:`, results);
 })
